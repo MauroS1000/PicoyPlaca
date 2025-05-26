@@ -1,0 +1,6 @@
+com\mauro\picoyplaca\dto\ResultadoValidacion.class
+com\mauro\picoyplaca\controller\PicoPlacaController.class
+com\mauro\picoyplaca\PicoPlacaApplication.class
+com\mauro\picoyplaca\service\PicoPlacaService.class
+com\mauro\picoyplaca\service\PicoPlacaService$1.class
+com\mauro\picoyplaca\exception\CustomExceptionHandler.class
