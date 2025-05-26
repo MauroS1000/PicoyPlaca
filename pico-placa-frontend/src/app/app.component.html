@@ -1,0 +1,53 @@
+<div class="container mt-5">
+  <h1 class="text-center mb-4">Consultar Pico y Placa</h1>
+  
+  <div class="card shadow" style="max-width: 500px; margin: 0 auto;">
+    <div class="card-body">
+      <form [formGroup]="consultaForm" (ngSubmit)="onSubmit()">
+        
+        <!-- Campo Placa -->
+        <div class="mb-3">
+          <label class="form-label">Placa del vehículo</label>
+          <input type="text" 
+                 class="form-control"
+                 formControlName="placa"
+                 placeholder="Ej: PBC-1234">
+          <div *ngIf="consultaForm.get('placa')?.invalid && consultaForm.get('placa')?.touched" 
+               class="text-danger mt-1">
+            Formato inválido. Ejemplo: ABC-1234
+          </div>
+        </div>
+
+        <!-- Campo Fecha/Hora -->
+        <div class="mb-4">
+          <label class="form-label">Fecha y Hora</label>
+          <input type="datetime-local" 
+                 class="form-control"
+                 formControlName="fechaHora">
+          <div *ngIf="consultaForm.get('fechaHora')?.invalid && consultaForm.get('fechaHora')?.touched" 
+               class="text-danger mt-1">
+            Fecha/hora requerida
+          </div>
+        </div>
+
+        <!-- Botón Submit -->
+        <button type="submit" 
+                class="btn btn-primary w-100"
+                [disabled]="!consultaForm.valid">
+          Consultar
+        </button>
+      </form>
+
+      <!-- Resultado -->
+      <div *ngIf="resultado" class="mt-4 p-3" [ngClass]="{'bg-success': resultado.permitido, 'bg-danger': !resultado.permitido}">
+        <h5 class="text-white">{{ resultado.mensaje }}</h5>
+        <p class="text-white mb-0">Placa: {{ resultado.placa }}</p>
+      </div>
+
+      <!-- Error -->
+      <div *ngIf="error" class="mt-4 alert alert-danger">
+        {{ error }}
+      </div>
+    </div>
+  </div>
+</div>
