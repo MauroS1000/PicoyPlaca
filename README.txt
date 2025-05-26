@@ -38,11 +38,11 @@ npm install
 ng serve
 Aplicación disponible en: http://localhost:4200
 
-Configuración ⚙️
+Configuración ⚙
 Variable	Valor por Defecto	Descripción
 BACKEND_URL	http://localhost:8080	URL del backend Spring Boot
 CORS_ORIGINS	http://localhost:4200	Orígenes permitidos para CORS
-Uso de la API 🔍
+Uso de la API 
 Ejemplo con curl:
 bash
 curl -X POST "http://localhost:8080/api/validar" \
@@ -54,7 +54,7 @@ json
   "permitido": false,
   "mensaje": "NO puedes circular. Restricción aplicada."
 }
-Despliegue en Producción 🚢
+Despliegue en Producción 
 Frontend:
 
 bash
@@ -75,7 +75,7 @@ dockerfile
 FROM eclipse-temurin:17-jdk
 COPY target/*.jar app.jar
 ENTRYPOINT ["java","-jar","/app.jar"]
-Estructura del Proyecto 📂
+Estructura del Proyecto 
 pico-y-placa/
 ├── picoyplaca/               # Código Spring Boot
 │   ├── src/
