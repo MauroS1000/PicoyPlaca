@@ -64,7 +64,7 @@ Los archivos estáticos se generan en dist/
 
 Backend:
 
-bash
+```bash
 cd backend
 ./mvnw clean package
 java -jar target/*.jar
