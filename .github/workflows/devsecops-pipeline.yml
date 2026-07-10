@@ -83,10 +83,14 @@ jobs:
         push: true
         tags: ${{ secrets.DOCKER_USERNAME }}/picoyplaca-frontend:latest
 
-  # 4 y 5. DESPLIEGUE CONTINUO Y ANÁLISIS DAST (Unificados)
+# 4 y 5. DESPLIEGUE CONTINUO Y ANÁLISIS DAST (Unificados)
   deploy-and-dast:
     needs: package-and-push
     runs-on: ubuntu-latest
+    # Se otorgan permisos explícitos para que ZAP pueda crear el Issue con los resultados
+    permissions:
+      issues: write
+      contents: read
     steps:
     - name: Clonar el repositorio
       uses: actions/checkout@v4
@@ -98,7 +102,6 @@ jobs:
 
     - name: Desplegar Manifiestos y Configurar Red
       run: |
-        # Reemplazar el texto de ejemplo por tu usuario real de Docker Hub de forma automática
         sed -i 's/tu-usuario-docker/${{ secrets.DOCKER_USERNAME }}/g' k8s/backend-k8s.yaml
         sed -i 's/tu-usuario-docker/${{ secrets.DOCKER_USERNAME }}/g' k8s/frontend-k8s.yaml
         
@@ -114,10 +117,19 @@ jobs:
         sleep 10
         
         echo "Ajustando permisos para el reporte de ZAP..."
-        chmod 777 .
+        chmod 777 . 
 
     - name: Escaneo Dinámico DAST con OWASP ZAP (Baseline Scan)
       uses: zaproxy/action-baseline@v0.12.0
       with:
         target: 'http://localhost:30080'
         fail_action: false
+
+    # Este paso es fundamental para extraer las evidencias solicitadas en la rúbrica
+    - name: Guardar Evidencias (Reporte DAST)
+      uses: actions/upload-artifact@v4
+      with:
+        name: reporte-dast-zap
+        path: |
+          report_html.html
+          report_md.md
