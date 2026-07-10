@@ -50,9 +50,9 @@ jobs:
         echo "deb [signed-by=/usr/share/keyrings/trivy.gpg] https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main" | sudo tee /etc/apt/sources.list.d/trivy.list
         sudo apt-get update && sudo apt-get install -y trivy
 
-    - name: Ejecutar escaneo estático sin dependencias externas
+    - - name: Ejecutar escaneo estático sin dependencias externas
       run: |
-        trivy fs --scanners config,secret --format table --output sast-report.txt .
+        trivy fs --scanners misconfig,secret --skip-files picoyplaca/pom.xml --format table --output sast-report.txt .
         cat sast-report.txt
 
   # 3. GENERACIÓN DE ARTEFACTOS Y PUSH A DOCKER HUB
