@@ -5,24 +5,25 @@ on:
     branches: [ "main", "master" ]
 
 jobs:
-  # 1. ETAPA DE BUILD Y PRUEBAS
-  build-and-test:
+  # Unificamos Build, Test y SAST en un solo entorno para reutilizar la caché local
+  build-test-and-sast:
     runs-on: ubuntu-latest
     steps:
     - name: Clonar el repositorio
       uses: actions/checkout@v4
 
-    - name: Configurar Java 17
+    - name: Configurar Java 17 con Caché Automática de Maven
       uses: actions/setup-java@v4
       with:
         java-version: '17'
         distribution: 'temurin'
+        cache: 'maven' # Esto guarda automáticamente las dependencias en caché de GitHub
 
-    - name: Compilar y Probar el Backend (Spring Boot)
+    - name: Compilar y Descargar Dependencias del Backend (Spring Boot)
       run: |
         cd picoyplaca
         chmod +x mvnw
-        ./mvnw clean test
+        ./mvnw clean test dependency:resolve # Descarga todo localmente para que Trivy no falle
 
     - name: Configurar Node.js
       uses: actions/setup-node@v4
@@ -34,14 +35,9 @@ jobs:
         cd pico-placa-frontend
         npm install
 
-  # 2. INTEGRACIÓN DEVSECOPS: ANÁLISIS SAST (Herramienta 1 de Seguridad)
-  security-sast:
-    needs: build-and-test
-    runs-on: ubuntu-latest
-    steps:
-    - name: Clonar el repositorio
-      uses: actions/checkout@v4
-
+    # INTEGRACIÓN DEVSECOPS: ANÁLISIS SAST (Herramienta 1 de Seguridad)
+    # Al estar en el mismo runner, Trivy usará la carpeta ~/.m2 local y evitará el error 429
+    <br>
     - name: Escaneo de Vulnerabilidades SAST con Trivy
       uses: aquasecurity/trivy-action@master
       with:
@@ -51,9 +47,9 @@ jobs:
         output: 'sast-report.txt'
         severity: 'HIGH,CRITICAL'
 
-  # 3. GENERACIÓN DE ARTEFACTOS Y PUSH A DOCKER HUB
+  # GENERACIÓN DE ARTEFACTOS Y PUSH A DOCKER HUB
   package-and-push:
-    needs: security-sast
+    needs: build-test-and-sast
     runs-on: ubuntu-latest
     steps:
     - name: Clonar el repositorio
@@ -62,7 +58,6 @@ jobs:
     - name: Autenticación en Docker Hub
       uses: docker/login-action@v3
       with:
-        # Debes configurar estos Secrets en la pestaña de Configuración de tu Repo de GitHub
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
 
@@ -80,7 +75,7 @@ jobs:
         push: true
         tags: ${{ secrets.DOCKER_USERNAME }}/picoyplaca-frontend:latest
 
-  # 4. DESPLIEGUE CONTINUO EN KUBERNETES
+  # DESPLIEGUE CONTINUO EN KUBERNETES
   deploy-to-k8s:
     needs: package-and-push
     runs-on: ubuntu-latest
@@ -88,7 +83,7 @@ jobs:
     - name: Clonar el repositorio
       uses: actions/checkout@v4
 
-    - name: Configurar Clúster Kubernetes Local (Mínimo para evidencias)
+    - name: Configurar Clúster Kubernetes Local
       uses: engineerd/setup-kind@v0.5.0
       with:
         version: "v0.11.1"
@@ -99,7 +94,7 @@ jobs:
         kubectl apply -f k8s/frontend-k8s.yaml
         kubectl get pods
 
-  # 5. INTEGRACIÓN DEVSECOPS: ANÁLISIS DAST (Herramienta 2 de Seguridad)
+  # INTEGRACIÓN DEVSECOPS: ANÁLISIS DAST (Herramienta 2 de Seguridad)
   security-dast:
     needs: deploy-to-k8s
     runs-on: ubuntu-latest
@@ -107,7 +102,6 @@ jobs:
     - name: Escaneo Dinámico DAST con OWASP ZAP (Baseline Scan)
       uses: zaproxy/action-baseline@v0.12.0
       with:
-        # Simulamos el escaneo dinámico directo sobre un endpoint simulado o público de pruebas
         target: 'http://localhost:30080'
         rules_file_name: '.zap/rules.tsv'
         fail_action: false
