@@ -83,8 +83,8 @@ jobs:
         push: true
         tags: ${{ secrets.DOCKER_USERNAME }}/picoyplaca-frontend:latest
 
-  # 4. DESPLIEGUE CONTINUO EN KUBERNETES
-  deploy-to-k8s:
+  # 4 y 5. DESPLIEGUE CONTINUO Y ANÁLISIS DAST (Unificados)
+  deploy-and-dast:
     needs: package-and-push
     runs-on: ubuntu-latest
     steps:
@@ -96,20 +96,24 @@ jobs:
       with:
         version: "v0.11.1"
 
-    - name: Desplegar Manifiestos en Kubernetes
+    - name: Desplegar Manifiestos y Configurar Red
       run: |
         kubectl apply -f k8s/backend-k8s.yaml
         kubectl apply -f k8s/frontend-k8s.yaml
-        kubectl get pods
+        
+        echo "Esperando inicialización de contenedores..."
+        kubectl rollout status deployment/picoyplaca-backend --timeout=120s
+        kubectl rollout status deployment/picoyplaca-frontend --timeout=120s
+        
+        echo "Habilitando port-forwarding para el escáner DAST..."
+        kubectl port-forward svc/picoyplaca-frontend-service 30080:80 &
+        sleep 10
+        
+        echo "Ajustando permisos para el reporte de ZAP..."
+        chmod 777 . 
 
-  # 5. INTEGRACIÓN DEVSECOPS: ANÁLISIS DAST (Herramienta 2 de Seguridad)
-  security-dast:
-    needs: deploy-to-k8s
-    runs-on: ubuntu-latest
-    steps:
     - name: Escaneo Dinámico DAST con OWASP ZAP (Baseline Scan)
       uses: zaproxy/action-baseline@v0.12.0
       with:
         target: 'http://localhost:30080'
-        rules_file_name: '.zap/rules.tsv'
         fail_action: false
