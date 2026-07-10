@@ -98,6 +98,10 @@ jobs:
 
     - name: Desplegar Manifiestos y Configurar Red
       run: |
+        # Reemplazar el texto de ejemplo por tu usuario real de Docker Hub de forma automática
+        sed -i 's/tu-usuario-docker/${{ secrets.DOCKER_USERNAME }}/g' k8s/backend-k8s.yaml
+        sed -i 's/tu-usuario-docker/${{ secrets.DOCKER_USERNAME }}/g' k8s/frontend-k8s.yaml
+        
         kubectl apply -f k8s/backend-k8s.yaml
         kubectl apply -f k8s/frontend-k8s.yaml
         
@@ -110,7 +114,7 @@ jobs:
         sleep 10
         
         echo "Ajustando permisos para el reporte de ZAP..."
-        chmod 777 . 
+        chmod 777 .
 
     - name: Escaneo Dinámico DAST con OWASP ZAP (Baseline Scan)
       uses: zaproxy/action-baseline@v0.12.0
