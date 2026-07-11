@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: backend
-        image: tu-usuario-docker/picoyplaca-backend:latest
+        image: mauro101/picoyplaca-backend:latest
         ports:
         - containerPort: 8080
 ---
