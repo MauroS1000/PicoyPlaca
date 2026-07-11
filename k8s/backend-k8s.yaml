@@ -16,7 +16,6 @@ spec:
     spec:
       containers:
       - name: backend
-        # Reemplaza 'tu-usuario-docker' por tu cuenta real de Docker Hub cuando lo subas
         image: tu-usuario-docker/picoyplaca-backend:latest
         ports:
         - containerPort: 8080
