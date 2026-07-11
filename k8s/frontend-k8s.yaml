@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: frontend
-        image: tu-usuario-docker/picoyplaca-frontend:latest
+        image: mauro101/picoyplaca-frontend:latest
         ports:
         - containerPort: 80
 ---
