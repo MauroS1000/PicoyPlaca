@@ -35,10 +35,30 @@ export class AppComponent {
             this.error = '';
           },
           error: (err) => {
-            this.error = err.error || 'Error al conectar con el servidor';
+            this.error = this.obtenerMensajeError(err);
             this.resultado = null;
           }
         });
     }
+  }
+
+  private obtenerMensajeError(err: any): string {
+    if (typeof err?.error === 'string' && err.error.trim()) {
+      return err.error;
+    }
+
+    if (typeof err?.error?.message === 'string' && err.error.message.trim()) {
+      return err.error.message;
+    }
+
+    if (err?.status === 0 || err?.status === 504) {
+      return 'No se pudo conectar con el backend. Verifica que Spring Boot este corriendo en http://localhost:8080.';
+    }
+
+    if (err?.status) {
+      return `Error ${err.status}: no se pudo completar la consulta.`;
+    }
+
+    return 'Error al conectar con el servidor';
   }
 }
