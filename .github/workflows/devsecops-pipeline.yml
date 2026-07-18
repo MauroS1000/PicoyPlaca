@@ -62,28 +62,35 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Install Trivy
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y wget apt-transport-https gnupg lsb-release
+          wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | gpg --dearmor | sudo tee /usr/share/keyrings/trivy.gpg > /dev/null
+          echo "deb [signed-by=/usr/share/keyrings/trivy.gpg] https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main" | sudo tee /etc/apt/sources.list.d/trivy.list
+          sudo apt-get update
+          sudo apt-get install -y trivy
+
       - name: Scan repository with Trivy
-        uses: aquasecurity/trivy-action@v0.33.1
-        with:
-          scan-type: fs
-          scan-ref: .
-          scanners: vuln,secret,config
-          severity: CRITICAL,HIGH
-          ignore-unfixed: true
-          format: table
-          exit-code: "0"
+        run: |
+          trivy fs \
+            --scanners vuln,secret,config \
+            --severity CRITICAL,HIGH \
+            --ignore-unfixed \
+            --format table \
+            --exit-code 0 \
+            .
 
       - name: Render GitOps manifests
         run: kubectl kustomize gitops/overlays/dev > rendered-manifests.yaml
 
       - name: Scan rendered Kubernetes manifests
-        uses: aquasecurity/trivy-action@v0.33.1
-        with:
-          scan-type: config
-          scan-ref: rendered-manifests.yaml
-          severity: CRITICAL,HIGH
-          format: table
-          exit-code: "0"
+        run: |
+          trivy config \
+            --severity CRITICAL,HIGH \
+            --format table \
+            --exit-code 0 \
+            rendered-manifests.yaml
 
   package-sign-and-push:
     name: Build, Push, SBOM and Sign Images
