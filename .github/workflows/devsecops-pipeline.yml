@@ -99,14 +99,13 @@ jobs:
       with:
         version: "v0.11.1"
 
-    - name: Instalar Argo CD en el Clúster
+    - - name: Instalar Argo CD en el Clúster
       run: |
         kubectl create namespace argocd
         kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
         
         echo "Esperando inicialización de los servicios de Argo CD..."
         kubectl wait --for=condition=Ready pods --all -n argocd --timeout=300s
-
     - name: Desplegar la aplicación mediante GitOps (Argo CD)
       run: |
         # Inyectamos el CRD (Custom Resource Definition) para que ArgoCD jale el código
