@@ -1,0 +1,19 @@
+# Java / Maven
+picoyplaca/target/
+*.class
+
+# Node / Angular
+pico-placa-frontend/node_modules/
+pico-placa-frontend/dist/
+pico-placa-frontend/.angular/
+
+# Reports and local tooling
+coverage/
+*.log
+.worktrees/
+
+# IDEs and operating systems
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db

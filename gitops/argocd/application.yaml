@@ -1,0 +1,22 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: picoyplaca-dev
+  namespace: argocd
+  labels:
+    app.kubernetes.io/part-of: picoyplaca
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/MauroS1000/PicoyPlaca.git
+    targetRevision: main
+    path: gitops/overlays/dev
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: picoyplaca
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

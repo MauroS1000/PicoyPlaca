@@ -75,8 +75,12 @@ public class PicoPlacaService {
         LocalTime inicioTarde = LocalTime.of(16, 0);
         LocalTime finTarde = LocalTime.of(20, 30);
 
-        return (hora.isAfter(inicioManana) && hora.isBefore(finManana)) ||
-               (hora.isAfter(inicioTarde) && hora.isBefore(finTarde));
+        return estaEntre(hora, inicioManana, finManana) ||
+               estaEntre(hora, inicioTarde, finTarde);
+    }
+
+    private boolean estaEntre(LocalTime hora, LocalTime inicio, LocalTime fin) {
+        return !hora.isBefore(inicio) && !hora.isAfter(fin);
     }
 
     private ResultadoValidacion generarResultado(

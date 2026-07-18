@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: picoyplaca-frontend
+  labels:
+    app.kubernetes.io/name: picoyplaca-frontend
+    app.kubernetes.io/part-of: picoyplaca
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: picoyplaca-frontend
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: picoyplaca-frontend
+        app.kubernetes.io/part-of: picoyplaca
+    spec:
+      containers:
+        - name: frontend
+          image: mauro101/picoyplaca-frontend:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8080
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 20
+            periodSeconds: 20
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 250m
+              memory: 128Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            runAsUser: 101
+            readOnlyRootFilesystem: false
+            capabilities:
+              drop:
+                - ALL
