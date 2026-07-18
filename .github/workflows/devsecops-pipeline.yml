@@ -83,7 +83,7 @@ jobs:
         push: true
         tags: ${{ secrets.DOCKER_USERNAME }}/picoyplaca-frontend:latest
 
-# 4 y 5. DESPLIEGUE CONTINUO Y ANÁLISIS DAST (Unificados)
+  # 4 y 5. GITOPS (ARGO CD) Y ANÁLISIS DAST
   deploy-and-dast:
     needs: package-and-push
     runs-on: ubuntu-latest
@@ -99,18 +99,45 @@ jobs:
       with:
         version: "v0.11.1"
 
-    - name: Desplegar Manifiestos y Configurar Red
+    - name: Instalar Argo CD en el Clúster
       run: |
-        sed -i 's/tu-usuario-docker/${{ secrets.DOCKER_USERNAME }}/g' k8s/backend-k8s.yaml
-        sed -i 's/tu-usuario-docker/${{ secrets.DOCKER_USERNAME }}/g' k8s/frontend-k8s.yaml
+        kubectl create namespace argocd
+        kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
         
-        kubectl apply -f k8s/backend-k8s.yaml
-        kubectl apply -f k8s/frontend-k8s.yaml
+        echo "Esperando inicialización de los servicios de Argo CD..."
+        kubectl wait --for=condition=Ready pods --all -n argocd --timeout=300s
+
+    - name: Desplegar la aplicación mediante GitOps (Argo CD)
+      run: |
+        # Inyectamos el CRD (Custom Resource Definition) para que ArgoCD jale el código
+        cat <<EOF | kubectl apply -f -
+        apiVersion: argoproj.io/v1alpha1
+        kind: Application
+        metadata:
+          name: picoyplaca-app
+          namespace: argocd
+        spec:
+          project: default
+          source:
+            repoURL: 'https://github.com/${{ github.repository }}.git'
+            path: k8s
+            targetRevision: ${{ github.sha }}
+          destination:
+            server: 'https://kubernetes.default.svc'
+            namespace: default
+          syncPolicy:
+            automated:
+              prune: true
+              selfHeal: true
+        EOF
         
-        echo "Esperando inicialización de contenedores..."
+        echo "Esperando a que Argo CD sincronice los contenedores..."
+        sleep 20
         kubectl rollout status deployment/picoyplaca-backend --timeout=120s
         kubectl rollout status deployment/picoyplaca-frontend --timeout=120s
-        
+
+    - name: Preparar entorno para DAST
+      run: |
         echo "Habilitando port-forwarding para el escáner DAST..."
         kubectl port-forward svc/picoyplaca-frontend-service 30080:80 &
         sleep 10
