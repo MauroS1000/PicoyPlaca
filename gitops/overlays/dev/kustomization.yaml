@@ -2,9 +2,11 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 namespace: picoyplaca
 resources:
-  - ../../base
+- ../../base
 images:
-  - name: mauro101/picoyplaca-backend
-    newTag: latest
-  - name: mauro101/picoyplaca-frontend
-    newTag: latest
+- name: mauro101/picoyplaca-backend
+  newName: mauro101/picoyplaca-backend
+  newTag: b9498f7cb4b071ccf749de67cbf71e8d5e2a0a6c
+- name: mauro101/picoyplaca-frontend
+  newName: mauro101/picoyplaca-frontend
+  newTag: b9498f7cb4b071ccf749de67cbf71e8d5e2a0a6c
