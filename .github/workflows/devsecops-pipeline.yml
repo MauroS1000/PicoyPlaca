@@ -99,7 +99,7 @@ jobs:
       with:
         version: "v0.11.1"
 
-    - - name: Instalar Argo CD en el Clúster
+    - name: Instalar Argo CD en el Clúster
       run: |
         kubectl create namespace argocd
         kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
