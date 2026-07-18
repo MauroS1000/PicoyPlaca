@@ -6,7 +6,7 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class PlacaService {
-  private apiUrl = 'http://localhost:8080/api/validar';
+  private apiUrl = '/api/validar';
 
   constructor(private http: HttpClient) { }
 

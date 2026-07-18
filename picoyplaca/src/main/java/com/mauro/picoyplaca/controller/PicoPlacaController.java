@@ -9,13 +9,17 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-@CrossOrigin(origins = "http://localhost:4200") // Habilitar CORS para Angular
 @RestController
 @RequestMapping("/api")
 public class PicoPlacaController {
 
     @Autowired
     private PicoPlacaService picoPlacaService;
+
+    @GetMapping("/health")
+    public ResponseEntity<String> health() {
+        return ResponseEntity.ok("ok");
+    }
 
     @PostMapping("/validar")
     public ResponseEntity<ResultadoValidacion> validarPicoPlaca(
