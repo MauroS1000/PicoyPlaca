@@ -28,14 +28,14 @@ npm ci
 npm start
 ```
 
-El frontend local usa `proxy.conf.json` para enviar `/api` al backend en `http://localhost:8080`.
+El frontend local usa `proxy.conf.json` para enviar `/api` al backend en `http://localhost:8081`.
 
-API local: `http://localhost:8080/api/validar`
+API local: `http://localhost:8081/api/validar`
 
 ## API
 
 ```bash
-curl -X POST "http://localhost:8080/api/validar" \
+curl -X POST "http://localhost:8081/api/validar" \
   -H "Content-Type: application/x-www-form-urlencoded" \
   -d "placa=PBC-1231&fechaHora=2026-07-20T07:30"
 ```
@@ -53,7 +53,7 @@ Respuesta:
 Health check:
 
 ```bash
-curl http://localhost:8080/api/health
+curl http://localhost:8081/api/health
 ```
 
 ## CI/CD con Argo CD
