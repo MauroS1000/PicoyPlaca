@@ -28,6 +28,8 @@ npm ci
 npm start
 ```
 
+El frontend local usa `proxy.conf.json` para enviar `/api` al backend en `http://localhost:8080`.
+
 API local: `http://localhost:8080/api/validar`
 
 ## API
