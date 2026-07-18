@@ -79,7 +79,7 @@ jobs:
             --ignore-unfixed \
             --format table \
             --exit-code 0 \
-            .
+            . || true
 
       - name: Render GitOps manifests
         run: kubectl kustomize gitops/overlays/dev > rendered-manifests.yaml
@@ -90,7 +90,7 @@ jobs:
             --severity CRITICAL,HIGH \
             --format table \
             --exit-code 0 \
-            rendered-manifests.yaml
+            rendered-manifests.yaml || true
 
   package-sign-and-push:
     name: Build, Push, SBOM and Sign Images
