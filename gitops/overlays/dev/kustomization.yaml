@@ -6,7 +6,7 @@ resources:
 images:
 - name: mauro101/picoyplaca-backend
   newName: mauro101/picoyplaca-backend
-  newTag: b9498f7cb4b071ccf749de67cbf71e8d5e2a0a6c
+  newTag: 2f705ff0a2c15b06ab2a058888a75749f356d329
 - name: mauro101/picoyplaca-frontend
   newName: mauro101/picoyplaca-frontend
-  newTag: b9498f7cb4b071ccf749de67cbf71e8d5e2a0a6c
+  newTag: 2f705ff0a2c15b06ab2a058888a75749f356d329
