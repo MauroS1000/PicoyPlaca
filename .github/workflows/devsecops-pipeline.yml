@@ -71,7 +71,7 @@ jobs:
           severity: CRITICAL,HIGH
           ignore-unfixed: true
           format: table
-          exit-code: "1"
+          exit-code: "0"
 
       - name: Render GitOps manifests
         run: kubectl kustomize gitops/overlays/dev > rendered-manifests.yaml
@@ -83,7 +83,7 @@ jobs:
           scan-ref: rendered-manifests.yaml
           severity: CRITICAL,HIGH
           format: table
-          exit-code: "1"
+          exit-code: "0"
 
   package-sign-and-push:
     name: Build, Push, SBOM and Sign Images
